@@ -26,15 +26,15 @@
 
 ## 2. 技术选型
 
-- 原生 HTML / CSS / JavaScript（ES Modules），无框架、无打包工具。
-- 推理引擎为纯函数模块，不触碰 DOM，可用 Node 内置测试运行器 `node --test` 单测。
+- 原生 HTML / CSS / JavaScript。四个逻辑模块（data / engine / storage / app）为 ES Modules，供 Node 内置测试运行器 `node --test` 单测。
+- 浏览器入口使用经典脚本 `js/bundle.js`：因为 ES Module 的 `import` 在 `file://` 下会被 CORS 拦截，需把四个 ESM 源文件打包成单文件经典脚本，才能双击 `index.html` 直接运行。打包由零依赖的 `tools/build.mjs` 完成，产物提交入库；`npm test` 中有一项 drift 测试保证产物与源文件一致。
 - `package.json` 仅声明 `npm test` 脚本，无第三方依赖。
 
 ## 3. 目录结构
 
 ```
 Akinator/
-├── index.html              页面骨架与挂载点
+├── index.html              页面骨架与挂载点（加载 js/bundle.js）
 ├── styles.css              神秘占卜风样式与动画
 ├── package.json            仅含 test 脚本，无依赖
 ├── js/
@@ -42,9 +42,11 @@ Akinator/
 │   │   └── characters.js   属性表 + 内置角色库（ES Module 导出）
 │   ├── engine.js           纯函数推理引擎（无 DOM）
 │   ├── storage.js          localStorage 封装
-│   └── app.js              状态机、DOM 渲染、游戏流程编排
-└── tests/
-    └── engine.test.js      引擎单元测试（node --test）
+│   ├── app.js              状态机、DOM 渲染、游戏流程编排
+│   └── bundle.js           由四个 ESM 源文件生成的经典脚本（file:// 用）
+├── tools/
+│   └── build.mjs           零依赖打包脚本
+└── tests/                  各模块单元测试 + bundle drift 测试（node --test）
 ```
 
 模块职责边界：

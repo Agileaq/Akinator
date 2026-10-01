@@ -476,12 +476,12 @@ test('shareOf / topGuess 计算占比与最优猜测', () => {
   g = applyAnswer(g, 'isReal', 'yes');
   const t = topGuess(g);
   assert.equal(t.character.id, 'newton');
-  assert.ok(Math.abs(t.share - 0.5) < 1e-9);
+  assert.ok(Math.abs(t.share - 1 / 2.1) < 1e-9);
 });
 
 test('shouldGuess 达到阈值 0.85 时返回 true', () => {
   const g = initGame(CHARS, ATTRS);
-  g.weights = { newton: 1, einstein: 1, mickey: 0.01 };
+  g.weights = { newton: 1, einstein: 0.02, mickey: 0.01 };
   assert.equal(shouldGuess(g), true);
 });
 

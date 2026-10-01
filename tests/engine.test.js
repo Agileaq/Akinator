@@ -109,3 +109,16 @@ test('topGuess 无候选时返回 null', () => {
   g.weights = {};
   assert.equal(topGuess(g), null);
 });
+
+import { learnAttributes } from '../js/engine.js';
+
+test('learnAttributes 只把明确的 yes/no 记为布尔值', () => {
+  const g = initGame(CHARS, ATTRS);
+  g.history = [
+    { attrId: 'isReal', answer: 'yes' },
+    { attrId: 'isMale', answer: 'no' },
+    { attrId: 'isWestern', answer: 'probably' },
+    { attrId: 'isScientist', answer: 'unknown' },
+  ];
+  assert.deepEqual(learnAttributes(g), { isReal: true, isMale: false });
+});

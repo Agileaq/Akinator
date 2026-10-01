@@ -114,3 +114,12 @@ export function exclude(game, charId) {
 export function activeCount(game) {
   return Object.keys(game.weights).length;
 }
+
+export function learnAttributes(game) {
+  const attrs = {};
+  for (const { attrId, answer } of game.history) {
+    if (answer === 'yes') attrs[attrId] = true;
+    else if (answer === 'no') attrs[attrId] = false;
+  }
+  return attrs;
+}

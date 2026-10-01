@@ -122,3 +122,22 @@ test('learnAttributes 只把明确的 yes/no 记为布尔值', () => {
   ];
   assert.deepEqual(learnAttributes(g), { isReal: true, isMale: false });
 });
+
+test('教过的角色在符合答案时可成为最优猜测（learn then reachable）', () => {
+  const charA = { id: 'charA', name: 'A', emoji: 'x', attrs: { isReal: true, isScientist: false } };
+  const charB = { id: 'charB', name: 'B', emoji: 'x', attrs: { isReal: false, isScientist: true } };
+  const history = [
+    { attrId: 'isReal', answer: 'yes' },
+    { attrId: 'isScientist', answer: 'yes' },
+  ];
+  const learned = {
+    id: 'learned',
+    name: '新角色',
+    emoji: 'x',
+    attrs: learnAttributes({ history }),
+  };
+  assert.deepEqual(learned.attrs, { isReal: true, isScientist: true });
+  let g = initGame([charA, charB, learned], ATTRS);
+  for (const { attrId, answer } of history) g = applyAnswer(g, attrId, answer);
+  assert.equal(topGuess(g).character.id, 'learned');
+});

@@ -51,3 +51,22 @@ test('saveStats 可读回', () => {
   saveStats({ games: 3, guessed: 1 });
   assert.deepEqual(loadStats(), { games: 3, guessed: 1 });
 });
+
+test('存储抛错时读取返回默认值且写入/删除不抛错', () => {
+  globalThis.localStorage = {
+    getItem: () => {
+      throw new Error('SecurityError');
+    },
+    setItem: () => {
+      throw new Error('QuotaExceededError');
+    },
+    removeItem: () => {
+      throw new Error('SecurityError');
+    },
+  };
+  assert.deepEqual(loadUserCharacters(), []);
+  assert.deepEqual(loadStats(), { games: 0, guessed: 0 });
+  assert.doesNotThrow(() => saveUserCharacter({ id: 'u', name: '甲', attrs: {} }));
+  assert.doesNotThrow(() => saveStats({ games: 1, guessed: 1 }));
+  assert.doesNotThrow(() => clearUserCharacters());
+});

@@ -167,9 +167,16 @@ function renderGuessing() {
     if (activeCount(state.game) < 2) {
       state.screen = 'learn';
       render();
-    } else {
-      advance();
+      return;
     }
+    const attrId = selectQuestion(state.game);
+    if (attrId) {
+      state.currentAttr = ATTRIBUTES.find((a) => a.id === attrId);
+      state.screen = 'asking';
+      render();
+      return;
+    }
+    advance();
   });
   bind('giveup', 'click', () => {
     state.screen = 'learn';

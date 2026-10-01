@@ -26,8 +26,8 @@ test('applyAnswer 按乘子更新并按最大值归一化', () => {
   let g = initGame(CHARS, ATTRS);
   g = applyAnswer(g, 'isReal', 'no');
   assert.equal(g.weights.mickey, 1);
-  assert.equal(g.weights.newton, 0.1);
-  assert.equal(g.weights.einstein, 0.1);
+  assert.ok(Math.abs(g.weights.newton - 0.1) < 1e-9);
+  assert.ok(Math.abs(g.weights.einstein - 0.1) < 1e-9);
   assert.deepEqual(g.asked, ['isReal']);
   assert.deepEqual(g.history, [{ attrId: 'isReal', answer: 'no' }]);
 });

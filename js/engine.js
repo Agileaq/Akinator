@@ -19,7 +19,7 @@ function normalize(weights) {
   for (const id of Object.keys(weights)) if (weights[id] > max) max = weights[id];
   if (max <= 0) return weights;
   const out = {};
-  for (const id of Object.keys(weights)) out[id] = Math.round((weights[id] / max) * 1e10) / 1e10;
+  for (const id of Object.keys(weights)) out[id] = weights[id] / max;
   return out;
 }
 

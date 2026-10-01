@@ -44,3 +44,31 @@ test('applyAnswer 不修改入参', () => {
   applyAnswer(g0, 'isReal', 'yes');
   assert.equal(JSON.stringify(g0), snapshot);
 });
+
+import { selectQuestion } from '../js/engine.js';
+
+test('selectQuestion 选择把候选切得最均衡的属性，并列取 id 字典序最小', () => {
+  const g = initGame(CHARS, ATTRS);
+  assert.equal(selectQuestion(g), 'isReal');
+});
+
+test('selectQuestion 跳过已问过的属性', () => {
+  let g = initGame(CHARS, ATTRS);
+  g = applyAnswer(g, 'isReal', 'yes');
+  assert.notEqual(selectQuestion(g), 'isReal');
+});
+
+test('selectQuestion 无可用属性时返回 null', () => {
+  const g = initGame(CHARS, ATTRS);
+  g.asked = ['isReal', 'isMale', 'isWestern', 'isScientist'];
+  assert.equal(selectQuestion(g), null);
+});
+
+test('selectQuestion 忽略完全偏向一侧的属性', () => {
+  const chars = [
+    { id: 'a', name: 'A', emoji: 'x', attrs: { isReal: true } },
+    { id: 'b', name: 'B', emoji: 'x', attrs: { isReal: true } },
+  ];
+  const g = initGame(chars, ATTRS);
+  assert.equal(selectQuestion(g), null);
+});

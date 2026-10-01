@@ -44,3 +44,34 @@ export function applyAnswer(game, attrId, answer) {
     history: [...game.history, { attrId, answer }],
   };
 }
+
+export function selectQuestion(game) {
+  let best = null;
+  let bestScore = 0;
+  for (const attr of game.attributes) {
+    if (game.asked.includes(attr.id)) continue;
+    let wYes = 0;
+    let wNo = 0;
+    let known = 0;
+    for (const c of game.characters) {
+      const w = game.weights[c.id];
+      if (w === undefined || w <= 0) continue;
+      const v = c.attrs ? c.attrs[attr.id] : undefined;
+      if (v === true) {
+        wYes += w;
+        known += 1;
+      } else if (v === false) {
+        wNo += w;
+        known += 1;
+      }
+    }
+    if (known < 2) continue;
+    const score = Math.min(wYes, wNo);
+    if (score <= 0) continue;
+    if (score > bestScore || (score === bestScore && best !== null && attr.id < best)) {
+      best = attr.id;
+      bestScore = score;
+    }
+  }
+  return best;
+}

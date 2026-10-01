@@ -75,3 +75,42 @@ export function selectQuestion(game) {
   }
   return best;
 }
+
+export function shareOf(game, charId) {
+  let sum = 0;
+  for (const id of Object.keys(game.weights)) sum += game.weights[id];
+  if (sum <= 0) return 0;
+  return (game.weights[charId] || 0) / sum;
+}
+
+export function topGuess(game) {
+  let topId = null;
+  let topW = 0;
+  for (const id of Object.keys(game.weights)) {
+    if (game.weights[id] > topW) {
+      topW = game.weights[id];
+      topId = id;
+    }
+  }
+  if (topId === null) return null;
+  const character = game.characters.find((c) => c.id === topId);
+  if (!character) return null;
+  return { character, share: shareOf(game, topId) };
+}
+
+export function shouldGuess(game, { threshold = 0.85, maxQuestions = 25 } = {}) {
+  const t = topGuess(game);
+  if (!t) return true;
+  if (game.history.length >= maxQuestions) return true;
+  return t.share >= threshold;
+}
+
+export function exclude(game, charId) {
+  const weights = { ...game.weights };
+  delete weights[charId];
+  return { ...game, weights: normalize(weights), excluded: [...game.excluded, charId] };
+}
+
+export function activeCount(game) {
+  return Object.keys(game.weights).length;
+}

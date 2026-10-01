@@ -72,3 +72,40 @@ test('selectQuestion 忽略完全偏向一侧的属性', () => {
   const g = initGame(chars, ATTRS);
   assert.equal(selectQuestion(g), null);
 });
+
+import { shareOf, topGuess, shouldGuess, exclude, activeCount } from '../js/engine.js';
+
+test('shareOf / topGuess 计算占比与最优猜测', () => {
+  let g = initGame(CHARS, ATTRS);
+  g = applyAnswer(g, 'isReal', 'yes');
+  const t = topGuess(g);
+  assert.equal(t.character.id, 'newton');
+  assert.ok(Math.abs(t.share - 1 / 2.1) < 1e-9);
+});
+
+test('shouldGuess 达到阈值 0.85 时返回 true', () => {
+  const g = initGame(CHARS, ATTRS);
+  g.weights = { newton: 1, einstein: 0.02, mickey: 0.01 };
+  assert.equal(shouldGuess(g), true);
+});
+
+test('shouldGuess 达到最大问题数时返回 true', () => {
+  const g = initGame([CHARS[0], CHARS[2]], ATTRS);
+  g.history = Array.from({ length: 25 }, () => ({ attrId: 'x', answer: 'unknown' }));
+  assert.equal(shouldGuess(g), true);
+});
+
+test('exclude 移除角色并重新归一化', () => {
+  let g = initGame(CHARS, ATTRS);
+  g = exclude(g, 'newton');
+  assert.equal('newton' in g.weights, false);
+  assert.deepEqual(g.excluded, ['newton']);
+  assert.deepEqual(g.weights, { einstein: 1, mickey: 1 });
+  assert.equal(activeCount(g), 2);
+});
+
+test('topGuess 无候选时返回 null', () => {
+  const g = initGame(CHARS, ATTRS);
+  g.weights = {};
+  assert.equal(topGuess(g), null);
+});
